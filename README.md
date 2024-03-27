@@ -10,7 +10,7 @@ smart_copy.sh copies files that satisfy the size and extension requirements from
 
 # Description
 
-Positional and long options must be written after all short ones, or else they will not be interpreted correctly.
+Positional arguments must be written after all short options, or else they will not be interpreted correctly.
 
 tests.sh contains the script's tests. Run in order to check if everything works properly, or read the code to see some examples of script use.
 
