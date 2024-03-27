@@ -1,15 +1,19 @@
 # The Smart Copy
+
 smart_copy.sh copies files that satisfy the size and extension requirements from the source to the target directory.
 
 
 # Synopsis
+
 ./smart_copy.sh [OPTIONS] SOURCE TARGET
 
 
 # Description
+
 Positional and long options must be written after all short ones, or else they will not be interpreted correctly.
+
 tests.sh contains the script's tests. Run in order to check if everything works properly, or read the code to see some examples of script use.
-arguments_extraction.sh
+
 ./source directory contains meaningless files that are used only for tests of tests.sh.
 
 
@@ -35,4 +39,5 @@ arguments_extraction.sh
 
 
 # Requirements
+
 This script is written for GNU bash version 5.1.16(1)-release (x86_64-pc-linux-gnu) installed on Ubuntu 22.04.4 LTS. It may or may not work properly on other Bash versions or operating systems.
