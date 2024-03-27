@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Script for command-line arguments extraction.
+
 # Initialization of variables.
 size_pattern="+0c"
 select_all="n"
@@ -14,7 +16,8 @@ declare only_extensions
 
 # Function to show help message.
 help_func () {
-    printf "${0} help:\nSmart Copy copies files that satisfy the size and extension requirements from the source to the target directory.\nPositional and long options must be written after all short ones, or else they will not be interpreted correctly.\n"
+    echo "${0} help:"
+    cat README.md
     exit 0
 }
 
@@ -31,7 +34,7 @@ print_options_values () {
 
 # Extraction of short input options values.
 while getopts s:i:o:haplvd arg; do
-    case $arg in
+    case "$arg" in
         h)
             help_func;;
         a)
@@ -45,7 +48,7 @@ while getopts s:i:o:haplvd arg; do
         d)
             disable_copying="y";;
         s)
-            if [[ $OPTARG =~ ^[+-]?[0-9]+[A-Za-z]*$ ]]
+            if [[ "$OPTARG" =~ ^[+-]?[0-9]+[A-Za-z]*$ ]]
                 then size_pattern="${OPTARG}"
                 else error_message "Value '${OPTARG}' of option -s is not valid."
             fi;;
@@ -61,17 +64,18 @@ agrs=( "$@" )
 remaining=( "${agrs[@]:((OPTIND - 1))}" )
 
 # Check if there is enough arguments.
-[[ ${#remaining[@]} -lt 2 ]] && error_message "<2 positional arguments."
+[[ "${#remaining[@]}" -lt 2 ]] && error_message "<2 positional arguments."
 
 # Extraction of remaining option values.
 for i in "${remaining[@]}"; do
     if [[ "$i" =~ ^--help$ ]]; then
         help_func
-    elif [[ ${#source_dir} -eq 0 ]]; then
+    elif [[ "${#source_dir}" -eq 0 ]]; then
         source_dir="$i"
-    elif [[ ${#target_dir} -eq 0 ]]; then
+    elif [[ "${#target_dir}" -eq 0 ]]; then
         target_dir="$i"
     else
         error_message "Too many positional arguments."
     fi
 done
+

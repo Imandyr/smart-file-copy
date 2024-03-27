@@ -1,36 +1,45 @@
 #!/bin/bash
 
+# The main script.
+
 # Extracts input arguments into variables.
 source ./arguments_extraction.sh "$@"
 
 # Prints arguments values if desired.
-[[ $print_values != "n" ]] && print_options_values
+[[ "$print_values" != "n" ]] && print_options_values
 
-# Makes target directory if it does not exists already.
-mkdir -p "$target_dir"
-
-# Decides whether to include hidden files or not by changing glob pattern of filename.
-[[ $select_all == "n" ]] && file_name="[^.]*" || file_name="*"
+# Decides whether to include hidden files or not by changing -not -regex pattern of filename.
+[[ "$select_all" == "n" ]] && file_name='.*/\..*' || file_name=""
 
 # Builds regex pattern based on given option values and finds all matching paths.
 pattern+="^.*"
-if [[ ${#only_extensions[@]} -gt 0 ]]; then
-    pattern+='\.('; pattern+="$(tr ' ' '|' <<< ${only_extensions[@]}))$"
-    paths=( $(find "$source_dir" -regextype "posix-extended" -regex "$pattern" -size "${size_pattern}" -iname "$file_name") )
-elif [[ ${#ignore_extensions[@]} -gt 0 ]]; then
-    pattern+='\.(?!'; pattern+="$(tr ' ' '|' <<< ${ignore_extensions[@]}))[^./]*$"
-    paths=( $(find "$source_dir" -size "${size_pattern}" -iname "$file_name" | grep -P "$pattern") )
+if [[ "${#only_extensions[@]}" -gt 0 ]]; then
+    # Only files with only_extensions[@] will be permitted.
+    pattern+='\.('; pattern+="$(tr ' ' '|' <<< "${only_extensions[@]}"))[^.]*$"
+    paths_str="$(find "$source_dir" -type f -regextype "posix-extended" -regex "$pattern" -not -regex "$file_name" -size "${size_pattern}")"
+elif [[ "${#ignore_extensions[@]}" -gt 0 ]]; then
+    # only files with ignore_extensions[@] will won't be permitted.
+    pattern='^[^.]+$|\.(?!('; pattern+="$(tr ' ' '|' <<< ${ignore_extensions[@]}))$)([^.]*$)"
+    paths_str="$(find "$source_dir" -type f -not -regex "$file_name" -size "${size_pattern}" | grep -P "$pattern")"
 else
+    # All files will be permited.
     pattern+="$"
-    paths=( $(find "$source_dir" -regextype "posix-extended" -regex "$pattern" -size "${size_pattern}" -iname "$file_name") )
+    paths_str="$(find "$source_dir" -type f -not -regex "$file_name" -size "${size_pattern}")"
 fi
 
 # Deletes $source_dir from paths so it will not be accidentally copied.
-[[ ${paths[0]} == "$source_dir" ]] && paths=( "${paths[@]:1}" )
+first="${#source_dir}"
+[[ "${paths_str::${first}}" == $(read line <<< $paths_str; echo $line) ]] && paths_str="${paths_str: $((first + 1)) : ${#paths_str}}"
 
 # Prints pattern and paths if desired.
-[[ $print_pattern != "n" ]] && echo "PATTERN = '${pattern}'"
-[[ $print_paths_list != "n" ]] && echo "PATHS = [ "${paths[@]}" ]"
+[[ "$print_pattern" != "n" ]] && echo "PATTERN = '${pattern}'; FILENAME = '$file_name'"
+[[ "$print_paths_list" != "n" ]] && printf "PATHS =\n${paths_str}\n"
 
 # Copying all matched files
-[[ $disable_copying == "n" ]] && cp -r "$paths" "$target_dir"
+if [[ "$disable_copying" == "n" ]]; then
+    while read line; do
+        mkdir -p "${target_dir}/$(dirname "$line")"
+        cp -r -p "$line" "${target_dir}/${line}"
+    done <<< "${paths_str}"
+fi
+
