@@ -5,7 +5,7 @@ smart_copy.sh copies files that satisfy the size and extension requirements from
 
 # Synopsis
 
-./smart_copy.sh [OPTIONS] SOURCE TARGET
+smart_copy.sh [OPTIONS] SOURCE TARGET
 
 
 # Description
@@ -14,7 +14,7 @@ Positional arguments must be written after all short options, or else they will 
 
 tests.sh contains the script's tests. Run in order to check if everything works properly, or read the code to see some examples of script use.
 
-./source directory contains meaningless files that are used only for tests of tests.sh.
+source directory contains meaningless files that are used only for tests of tests.sh.
 
 
 ## Option list
