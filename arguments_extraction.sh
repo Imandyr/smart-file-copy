@@ -17,7 +17,7 @@ declare only_extensions
 # Function to show help message.
 help_func () {
     echo "${0} help:"
-    cat README.md
+    cat "$(dirname $0)/README.md"
     exit 0
 }
 
