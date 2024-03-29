@@ -3,7 +3,7 @@
 # The main script.
 
 # Extracts input arguments into variables.
-source ./arguments_extraction.sh "$@"
+source "$(dirname $0)/arguments_extraction.sh" "$@"
 
 # Prints arguments values if desired.
 [[ "$print_values" != "n" ]] && print_options_values
